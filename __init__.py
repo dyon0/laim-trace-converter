@@ -21,6 +21,14 @@ from .self_checks import (
     CheckResult,
 )
 
+from .synthetic_generator import (
+    generate_dataset,
+    validate_against_spec,
+    Scenario,
+    DEFAULT_SCENARIOS,
+    SPAN_COLUMNS,
+)
+
 __all__ = [
     'convert',
     'main',
@@ -37,4 +45,9 @@ __all__ = [
     'CheckResult',
     'AEF_KINDS',
     'REQUIRED_TRACE_COLUMNS',
+    'generate_dataset',
+    'validate_against_spec',
+    'Scenario',
+    'DEFAULT_SCENARIOS',
+    'SPAN_COLUMNS',
 ]

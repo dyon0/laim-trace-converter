@@ -11,7 +11,37 @@ laim_converter/
 ├── __init__.py            # public API
 ├── converter.py           # основной конвертер (диспетчер по aef_kind, агрегация трейсов)
 ├── self_checks.py         # модуль самопроверки сгенерированной корзины
+├── synthetic_generator.py # генератор синтетической телеметрии по ТЗ (e2e-тесты)
 └── run_conversion.py      # CLI / точка входа с встроенными self-check'ами
+```
+
+## End-to-end проверка работоспособности
+
+Для smoke-тестирования всего конвейера без реальных данных используется
+`synthetic_generator.py`: он создаёт spans, *строго* соответствующие ТЗ
+(43 поля, страж-семантика, base64-идентификаторы, корректная иерархия,
+все enum-домены), и согласованную с ними `validation_data`.
+
+```bash
+# Режим queries: 12 трейсов, 4 сессии, прогон converter + self-check'ов
+python -m laim_converter.synthetic_generator \
+    --num-traces 12 --strict-spec --e2e
+
+# Режим dialogue (мульти-туровые сессии)
+python -m laim_converter.synthetic_generator \
+    --num-traces 20 --sessions 5 --mode dialogue --strict-spec --e2e
+```
+
+Из Python:
+
+```python
+from laim_converter import generate_dataset, convert_and_verify
+
+ds = generate_dataset(num_traces=50, seed=123)
+result = convert_and_verify(traces=ds['spans'],
+                            validation_data=ds['validation_data'],
+                            mode='queries', verbose=True)
+assert not result['report'].has_failures
 ```
 
 ## Поток данных
